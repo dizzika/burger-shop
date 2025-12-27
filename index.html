@@ -3,31 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Shop</title>
+    <title>Burger King 2.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: sans-serif; }
-        button {
-            background-color: #3390ec; 
-            color: white; 
-            padding: 20px 40px; 
-            font-size: 24px; 
-            border: none; 
-            border-radius: 12px;
-            cursor: pointer;
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--tg-theme-bg-color, #f5f5f5); color: var(--tg-theme-text-color, #000); }
+        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; padding-bottom: 80px; }
+        
+        .card { 
+            background: var(--tg-theme-secondary-bg-color, #fff); 
+            border-radius: 15px; 
+            overflow: hidden; 
+            text-align: center; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            transition: transform 0.2s;
+        }
+        .card:active { transform: scale(0.98); }
+        
+        .image-box { width: 100%; height: 120px; object-fit: cover; }
+        
+        .title { font-weight: bold; margin: 10px 0 5px; font-size: 14px; }
+        .price { color: #888; margin-bottom: 10px; font-size: 13px; }
+        
+        .btn-add { 
+            background: #ff8c00; color: white; border: none; 
+            padding: 8px 20px; border-radius: 20px; margin-bottom: 10px; 
+            font-size: 12px; font-weight: bold; cursor: pointer; 
+        }
+
+        /* Плавающая кнопка корзины */
+        .cart-btn {
+            position: fixed; bottom: 10px; left: 10px; right: 10px;
+            background: #3390ec; color: white;
+            padding: 15px; border-radius: 15px;
+            text-align: center; font-weight: bold; font-size: 16px;
+            display: none; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(51, 144, 236, 0.4);
         }
     </style>
 </head>
 <body>
-    <button onclick="buy()">КУПИТЬ БУРГЕР 🍔</button>
+
+    <div class="container">
+        <div class="card">
+            <img src="https://burger-king.by/images/product/b/2a7398a637d94e1.png" class="image-box">
+            <div class="title">Воппер Макс</div>
+            <div class="price">190 грн</div>
+            <button class="btn-add" onclick="add('Воппер Макс', 190)">В КОРЗИНУ</button>
+        </div>
+
+        <div class="card">
+            <img src="https://burger-king.by/images/product/b/1a2214434689255.png" class="image-box">
+            <div class="title">Картошка Фри</div>
+            <div class="price">85 грн</div>
+            <button class="btn-add" onclick="add('Картошка', 85)">В КОРЗИНУ</button>
+        </div>
+
+        <div class="card">
+            <img src="https://burger-king.by/images/product/b/3e0974864147773.png" class="image-box">
+            <div class="title">Кока-Кола</div>
+            <div class="price">45 грн</div>
+            <button class="btn-add" onclick="add('Кола', 45)">В КОРЗИНУ</button>
+        </div>
+
+        <div class="card">
+            <img src="https://burger-king.by/images/product/b/7d56b025345638c.png" class="image-box">
+            <div class="title">Наггетсы (9 шт)</div>
+            <div class="price">110 грн</div>
+            <button class="btn-add" onclick="add('Наггетсы', 110)">В КОРЗИНУ</button>
+        </div>
+    </div>
+
+    <div class="cart-btn" id="mainBtn" onclick="sendData()">
+        Оформить: 0 грн
+    </div>
 
     <script>
         let tg = window.Telegram.WebApp;
-        tg.expand();
+        tg.expand(); 
 
-        function buy() {
-            // Отправляем простую строку, чтобы точно сработало
-            tg.sendData("Пользователь купил бургер за 150 грн");
+        let cart = [];
+        let sum = 0;
+
+        function add(product, price) {
+            cart.push({title: product, price: price});
+            sum += price;
+            updateBtn();
+        }
+
+        function updateBtn() {
+            let btn = document.getElementById('mainBtn');
+            if (cart.length > 0) {
+                btn.style.display = 'block';
+                btn.innerText = `Оформить заказ (${sum} грн)`;
+            } else {
+                btn.style.display = 'none';
+            }
+        }
+
+        function sendData() {
+            // Превращаем корзину в текст и отправляем
+            tg.sendData(JSON.stringify(cart));
         }
     </script>
 </body>
