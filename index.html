@@ -3,105 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Burger King 2.0</title>
+    <title>Emoji Burger</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--tg-theme-bg-color, #f5f5f5); color: var(--tg-theme-text-color, #000); }
-        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; padding-bottom: 80px; }
-        
-        .card { 
-            background: var(--tg-theme-secondary-bg-color, #fff); 
-            border-radius: 15px; 
-            overflow: hidden; 
-            text-align: center; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            transition: transform 0.2s;
+        body { 
+            font-family: sans-serif; 
+            background-color: var(--tg-theme-bg-color, #fff); 
+            color: var(--tg-theme-text-color, #000); 
+            margin: 0; 
+            padding: 10px; 
+            padding-bottom: 80px;
         }
-        .card:active { transform: scale(0.98); }
-        
-        .image-box { width: 100%; height: 120px; object-fit: cover; }
-        
-        .title { font-weight: bold; margin: 10px 0 5px; font-size: 14px; }
-        .price { color: #888; margin-bottom: 10px; font-size: 13px; }
-        
-        .btn-add { 
-            background: #ff8c00; color: white; border: none; 
-            padding: 8px 20px; border-radius: 20px; margin-bottom: 10px; 
-            font-size: 12px; font-weight: bold; cursor: pointer; 
+        .item {
+            display: flex;
+            align-items: center;
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
         }
-
-        /* Плавающая кнопка корзины */
-        .cart-btn {
+        .icon { font-size: 40px; margin-right: 15px; }
+        .info { flex-grow: 1; }
+        .name { font-weight: bold; font-size: 16px; }
+        .price { color: #888; margin-top: 4px; }
+        .btn {
+            background: #3390ec; color: white; border: none;
+            padding: 10px 15px; border-radius: 8px; font-weight: bold;
+            cursor: pointer;
+        }
+        #mainBtn {
             position: fixed; bottom: 10px; left: 10px; right: 10px;
-            background: #3390ec; color: white;
-            padding: 15px; border-radius: 15px;
-            text-align: center; font-weight: bold; font-size: 16px;
+            background: #2ea6ff; color: white; padding: 15px;
+            text-align: center; border-radius: 12px; font-size: 18px; font-weight: bold;
             display: none; cursor: pointer;
-            box-shadow: 0 4px 10px rgba(51, 144, 236, 0.4);
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="card">
-            <img src="https://burger-king.by/images/product/b/2a7398a637d94e1.png" class="image-box">
-            <div class="title">Воппер Макс</div>
-            <div class="price">190 грн</div>
-            <button class="btn-add" onclick="add('Воппер Макс', 190)">В КОРЗИНУ</button>
+    <div class="item">
+        <div class="icon">🍔</div>
+        <div class="info">
+            <div class="name">Биг Мак</div>
+            <div class="price">150 грн</div>
         </div>
-
-        <div class="card">
-            <img src="https://burger-king.by/images/product/b/1a2214434689255.png" class="image-box">
-            <div class="title">Картошка Фри</div>
-            <div class="price">85 грн</div>
-            <button class="btn-add" onclick="add('Картошка', 85)">В КОРЗИНУ</button>
-        </div>
-
-        <div class="card">
-            <img src="https://burger-king.by/images/product/b/3e0974864147773.png" class="image-box">
-            <div class="title">Кока-Кола</div>
-            <div class="price">45 грн</div>
-            <button class="btn-add" onclick="add('Кола', 45)">В КОРЗИНУ</button>
-        </div>
-
-        <div class="card">
-            <img src="https://burger-king.by/images/product/b/7d56b025345638c.png" class="image-box">
-            <div class="title">Наггетсы (9 шт)</div>
-            <div class="price">110 грн</div>
-            <button class="btn-add" onclick="add('Наггетсы', 110)">В КОРЗИНУ</button>
-        </div>
+        <button class="btn" onclick="add('Биг Мак', 150)">➕</button>
     </div>
 
-    <div class="cart-btn" id="mainBtn" onclick="sendData()">
-        Оформить: 0 грн
+    <div class="item">
+        <div class="icon">🍟</div>
+        <div class="info">
+            <div class="name">Картошка</div>
+            <div class="price">80 грн</div>
+        </div>
+        <button class="btn" onclick="add('Картошка', 80)">➕</button>
     </div>
+
+    <div class="item">
+        <div class="icon">🥤</div>
+        <div class="info">
+            <div class="name">Кола</div>
+            <div class="price">40 грн</div>
+        </div>
+        <button class="btn" onclick="add('Кола', 40)">➕</button>
+    </div>
+
+    <div id="mainBtn" onclick="send()">Оформить</div>
 
     <script>
         let tg = window.Telegram.WebApp;
-        tg.expand(); 
+        tg.expand();
 
         let cart = [];
-        let sum = 0;
+        let total = 0;
 
-        function add(product, price) {
-            cart.push({title: product, price: price});
-            sum += price;
-            updateBtn();
-        }
-
-        function updateBtn() {
+        function add(name, price) {
+            cart.push({title: name, price: price});
+            total += price;
+            
             let btn = document.getElementById('mainBtn');
-            if (cart.length > 0) {
-                btn.style.display = 'block';
-                btn.innerText = `Оформить заказ (${sum} грн)`;
-            } else {
-                btn.style.display = 'none';
-            }
+            btn.style.display = 'block';
+            btn.innerText = `Оформить заказ (${total} грн)`;
         }
 
-        function sendData() {
-            // Превращаем корзину в текст и отправляем
+        function send() {
+            // Самый надежный способ отправки
             tg.sendData(JSON.stringify(cart));
         }
     </script>
