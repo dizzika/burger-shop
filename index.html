@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burger Shop</title>
+    <style>
+        body { font-family: sans-serif; background: var(--tg-theme-bg-color, #fff); color: var(--tg-theme-text-color, #000); padding: 20px; }
+        .item { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .btn { background: var(--tg-theme-button-color, #3390ec); color: var(--tg-theme-button-text-color, #fff); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        h1 { text-align: center; }
+    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <h1>🍔 Super Burger</h1>
+    
+    <div id="list">
+        <div class="item">
+            <span>Чизбургер (150 грн)</span>
+            <button class="btn" onclick="addItem('Чизбургер', 150)">Добавить</button>
+        </div>
+        <div class="item">
+            <span>Картошка Фри (80 грн)</span>
+            <button class="btn" onclick="addItem('Картошка', 80)">Добавить</button>
+        </div>
+        <div class="item">
+            <span>Кола (40 грн)</span>
+            <button class="btn" onclick="addItem('Кола', 40)">Добавить</button>
+        </div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp; // Инициализация
+        tg.expand(); // Раскрыть на весь экран
+
+        let cart = [];
+
+        function addItem(name, price) {
+            cart.push({product: name, price: price});
+            // Показываем главную кнопку "Купить" внизу
+            if (cart.length > 0) {
+                tg.MainButton.setText(`Оформить заказ (${cart.length} шт.)`);
+                tg.MainButton.show();
+            }
+        }
+
+        // Обработка клика по главной кнопке "Купить"
+        Telegram.WebApp.onEvent('mainButtonClicked', function(){
+            // Превращаем корзину в строку JSON и отправляем боту
+            let data = JSON.stringify(cart);
+            tg.sendData(data); 
+        });
+    </script>
+</body>
+</html>
